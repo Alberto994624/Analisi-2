@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Formativo - Analisi 2</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #2a2a72;
+      margin-bottom: 40px;
+    }
+    .quiz-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .question {
+      margin-bottom: 30px;
+    }
+    .question h3 {
+      color: #444;
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 8px;
+      background: #f7f9fc;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .options label:hover {
+      background: #e2ecf9;
+    }
+    .submit-btn {
+      display: block;
+      width: 100%;
+      background: #2a2a72;
+      color: white;
+      padding: 14px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .result {
+      margin-top: 40px;
+      padding: 25px;
+      background: #e3f2fd;
+      border-left: 5px solid #2196f3;
+      border-radius: 8px;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .correct { color: green; font-weight: bold; }
+    .incorrect { color: red; font-weight: bold; }
+    hr {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz Formativo – Analisi 2</h1>
+  <form id="quiz" class="quiz-container"></form>
+  <div id="result" class="result" style="display:none;"></div>
+
+  <script>
+    const questions = [
+      // Equazioni differenziali - 4 domande (1 esercizio e 1 teoria mantenuti, altri modificati)
+      {
+        question: "1) \\( y'' + y = 0 \\): quale è la soluzione generale corretta?",
+        options: [
+          "\\( y(x) = Ce^{x} \\)",
+          "\\( y(x) = C_1\\cos(x) + C_2\\sin(x) \\)",
+          "\\( y(x) = Cx^2 + D \\)",
+          "\\( y(x) = C_1e^{x} + C_2e^{-x} \\)"
+        ],
+        answer: 1,
+        explanation: "La soluzione generale dell'equazione armonica è \\( y = C_1\\cos(x) + C_2\\sin(x) \\), perché l'equazione ha radici immaginarie pure."
+      },
+      {
+        question: "2) Quale sistema differenziale descrive un’oscillazione smorzata?",
+        options: [
+          "\\( x'' + 2x' + x = 0 \\)",
+          "\\( x'' - x = 0 \\)",
+          "\\( x'' + x = 0 \\)",
+          "\\( x'' = 0 \\)"
+        ],
+        answer: 0,
+        explanation: "Il termine \\( 2x' \\) rappresenta lo smorzamento, tipico dell’equazione del moto smorzato."
+      },
+      {
+        question: "3) Considera l’equazione differenziale \\( y'' - 4y' + 4y = 0 \\). Qual è la forma generale della soluzione?",
+        options: [
+          "\\( y = C_1 e^{2x} + C_2 e^{-2x} \\)",
+          "\\( y = (C_1 + C_2 x) e^{2x} \\)",
+          "\\( y = C_1 \\cos(2x) + C_2 \\sin(2x) \\)",
+          "\\( y = C_1 e^{4x} + C_2 x e^{4x} \\)"
+        ],
+        answer: 1,
+        explanation: "L'equazione ha radici doppie reali \\( r=2 \\), quindi la soluzione è della forma \\( (C_1 + C_2 x) e^{2x} \\)."
+      },
+      {
+        question: "4) Qual è la definizione di stabilità di un punto di equilibrio in un sistema dinamico?",
+        options: [
+          "Ogni soluzione si allontana dal punto nel tempo.",
+          "Soluzioni inizialmente vicine rimangono vicine per sempre.",
+          "Il punto è un massimo locale della funzione.",
+          "Il sistema è lineare."
+        ],
+        answer: 1,
+        explanation: "Un punto di equilibrio è stabile se tutte le soluzioni inizialmente vicine rimangono vicine nel tempo."
+      },
+
+      // Calcolo differenziale - 4 domande (1 esercizio e 1 teoria mantenuti, altri modificati)
+      {
+        question: "5) In un punto critico libero, quale condizione è vera?",
+        options: [
+          "Il gradiente è parallelo alla funzione.",
+          "Il gradiente è nullo.",
+          "Il punto è sempre sul bordo.",
+          "È sempre un massimo assoluto."
+        ],
+        answer: 1,
+        explanation: "Il gradiente della funzione si annulla in un punto critico libero."
+      },
+      {
+        question: "6) Nel metodo dei moltiplicatori di Lagrange, \\( \\lambda \\) rappresenta:",
+        options: [
+          "Punto massimo assoluto.",
+          "Valore funzione obiettivo.",
+          "Variazione funzione obiettivo per variazioni del vincolo.",
+          "Solo per sistemi lineari."
+        ],
+        answer: 2,
+        explanation: "Il moltiplicatore \\( \\lambda \\) misura la sensibilità della funzione obiettivo rispetto al vincolo."
+      },
+      {
+        question: "7) Se \\( f(x,y) \\) è due volte derivabile, la matrice Hessiana serve per:",
+        options: [
+          "Calcolare il gradiente.",
+          "Determinare la natura di un punto critico.",
+          "Trovare i moltiplicatori di Lagrange.",
+          "Stimare la continuità."
+        ],
+        answer: 1,
+        explanation: "La matrice Hessiana fornisce informazioni sulla curvatura e aiuta a classificare i punti critici."
+      },
+      {
+        question: "8) La condizione necessaria affinché una funzione di più variabili abbia un massimo locale in un punto \\( \\mathbf{x}_0 \\) è:",
+        options: [
+          "Il gradiente in \\( \\mathbf{x}_0 \\) è nullo e Hessiana definita positiva.",
+          "Il gradiente in \\( \\mathbf{x}_0 \\) è nullo e Hessiana definita negativa.",
+          "Il gradiente in \\( \\mathbf{x}_0 \\) è nullo e Hessiana semidefinita positiva.",
+          "Il gradiente in \\( \\mathbf{x}_0 \\) è nullo e Hessiana definita negativa semidefinita."
+        ],
+        answer: 1,
+        explanation: "Per un massimo locale la Hessiana deve essere definita negativa (tutta negativa)."
+      },
+
+      // Calcolo integrale - 7 domande (2 esercizi e 2 teoria mantenuti, altri modificati)
+      {
+        question: "9) Volume generato dalla rotazione di \\( y = x^2 \\) attorno all'asse x su [0,1]:",
+        options: [
+          "\\( \\pi \\int_0^1 x^4 \\,dx \\)",
+          "\\( 2\\pi \\int_0^1 x^2 \\,dx \\)",
+          "\\( \\pi \\int_0^1 (x^2)^2 \\,dx \\)",
+          "\\( \\int_0^1 x^2 \\,dx \\)"
+        ],
+        answer: 2,
+        explanation: "Il volume è \\( \\pi \\int_0^1 (x^2)^2 dx = \\pi \\int_0^1 x^4 dx \\)."
+      },
+      {
+        question: "10) Quale integrale rappresenta il lavoro di un campo \\( \\vec{F} \\) lungo una curva \\( C \\)?",
+        options: [
+          "\\( \\int_C \\vec{F} \\cdot d\\vec{r} \\)",
+          "\\( \\int_C |\\vec{F}| \\, ds \\)",
+          "\\( \\int_C \\vec{F} \\cdot \\vec{n} \\, ds \\)",
+          "\\( \\int_C \\vec{F} \\cdot \\vec{r} \\, ds \\)"
+        ],
+        answer: 0,
+        explanation: "Il lavoro è dato dall'integrale di linea \\( \\int_C \\vec{F} \\cdot d\\vec{r} \\)."
+      },
+      {
+        question: "11) Calcola il valore di \\( \\int_0^1 \\int_0^x e^{x^2} \\, dy \\, dx \\).",
+        options: [
+          "\\( \\frac{e - 1}{2} \\)",
+          "\\( e - 1 \\)",
+          "\\( \\frac{1}{2} \\)",
+          "\\( e \\)"
+        ],
+        answer: 1,
+        explanation: "Integrando prima su \\( y \\) si ottiene \\( \\int_0^1 x e^{x^2} dx \\), che dà \\( \\frac{e - 1}{2} \\)."
+      },
+      {
+        question: "12) Il Teorema di Stokes afferma che:",
+        options: [
+          "L'integrale di linea di un campo vettoriale è uguale all'integrale di superficie del rotore.",
+          "L'integrale doppio è uguale all'integrale triplo.",
+          "L'integrale di un campo conservativo è zero su ogni curva.",
+          "L'integrale di superficie è sempre nullo."
+        ],
+        answer: 0,
+        explanation: "Il Teorema di Stokes collega integrale di linea con integrale di superficie del rotore."
+      },
+      {
+        question: "13) Quale condizione deve soddisfare un campo vettoriale \\( \\vec{F} \\) per essere il gradiente di una funzione scalare \\( \\phi \\)?",
+        options: [
+          "Il campo deve essere solenoidale.",
+          "Il campo deve avere rotore nullo e dominio semplicemente connesso.",
+          "Il campo deve avere divergenza nulla.",
+          "Il campo deve essere costante."
+        ],
+        answer: 1,
+        explanation: "Per essere gradiente, il campo deve avere rotore nullo in un dominio semplicemente connesso."
+      },
+      {
+        question: "14) Qual è la formula per calcolare il flusso di un campo \\( \\vec{F} \\) attraverso una superficie chiusa \\( S \\)?",
+        options: [
+          "\\( \\iint_S \\vec{F} \\cdot \\vec{n} \\, dS = \\iiint_V \\nabla \\cdot \\vec{F} \\, dV \\)",
+          "\\( \\int_C \\vec{F} \\cdot d\\vec{r} \\)",
+          "\\( \\iint_S \\nabla \\times \\vec{F} \\, dS \\)",
+          "\\( \\int_V \\vec{F} \\, dV \\)"
+        ],
+        answer: 0,
+        explanation: "Il Teorema della Divergenza di Gauss lega il flusso sulla superficie con l'integrale triplo della divergenza."
+      },
+      {
+        question: "15) Qual è la formula corretta per calcolare l'area di una superficie parametrica \\( \\vec{r}(u,v) \\)?",
+        options: [
+          "\\( \\iint_D \\| \\vec{r}_u + \\vec{r}_v \\| \\, du \\, dv \\)",
+          "\\( \\iint_D \\| \\vec{r}_u \\cdot \\vec{r}_v \\| \\, du \\, dv \\)",
+          "\\( \\iint_D \\| \\vec{r}_u \\times \\vec{r}_v \\| \\, du \\, dv \\)",
+          "\\( \\iint_D \\vec{r}_u \\cdot \\vec{r}_v \\, du \\, dv \\)"
+        ],
+        answer: 2,
+        explanation: "L'area di una superficie parametrica \\( \\vec{r}(u,v) \\) è data da \\( \\iint_D \\| \\vec{r}_u \\times \\vec{r}_v \\| \\, du \\, dv \\), che rappresenta l'elemento infinitesimo di area."
+      }
+    ];
+
+    function renderQuiz() {
+      const quizForm = document.getElementById('quiz');
+      questions.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.classList.add('question');
+        div.innerHTML = `
+          <h3>${q.question}</h3>
+          <div class="options">
+            ${q.options.map((opt, idx) => `
+              <label>
+                <input type="radio" name="q${i}" value="${idx}" />
+                ${opt}
+              </label>
+            `).join('')}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'submit';
+      submitBtn.textContent = 'Invia Risposte';
+      submitBtn.classList.add('submit-btn');
+      quizForm.appendChild(submitBtn);
+    }
+
+    function calculateResult(event) {
+  event.preventDefault();
+  const form = event.target;
+  let score = 0;
+  let details = '';
+
+  questions.forEach((q, i) => {
+    const selected = form[`q${i}`].value;
+    const correct = q.answer;
+    const isCorrect = parseInt(selected) === correct;
+
+    // Motivazioni per ogni risposta
+    const explanationsForOptions = q.options.map((opt, idx) => {
+      if (idx === correct) {
+        return `Risposta corretta perché: ${q.explanation}`;
+      } else {
+        // motivazioni personalizzate per ogni domanda e opzione
+        switch(i) {
+          case 0: // Domanda 1
+            switch(idx) {
+              case 0: return "Errato: \\( y = Ce^x \\) non soddisfa l'equazione perché le radici non sono reali positive.";
+              case 2: return "Errato: \\( y = Cx^2 + D \\) non è soluzione di un'equazione differenziale lineare con termini armonici.";
+              case 3: return "Errato: \\( y = C_1 e^x + C_2 e^{-x} \\) si riferisce ad equazione con radici reali e distinte.";
+            }
+            break;
+
+          case 1: // Domanda 2
+            switch(idx) {
+              case 1: return "Errato: \\( x'' - x = 0 \\) è un'oscillazione non smorzata.";
+              case 2: return "Errato: \\( x'' + x = 0 \\) è un'oscillazione armonica semplice, non smorzata.";
+              case 3: return "Errato: \\( x'' = 0 \\) non rappresenta un'oscillazione.";
+            }
+            break;
+
+          case 2: // Domanda 3
+            switch(idx) {
+              case 0: return "Errato: la soluzione indicata si riferisce a radici reali distinte ma errate.";
+              case 2: return "Errato: radici immaginarie non corrispondono all'equazione data.";
+              case 3: return "Errato: esponente e forma della soluzione sono sbagliati.";
+            }
+            break;
+
+          case 3: // Domanda 4
+            switch(idx) {
+              case 0: return "Errato: un punto stabile non allontana le soluzioni.";
+              case 2: return "Errato: la natura del punto non dipende dal massimo locale della funzione.";
+              case 3: return "Errato: linearità non implica stabilità del punto.";
+            }
+            break;
+
+          case 4: // Domanda 5
+            switch(idx) {
+              case 0: return "Errato: il gradiente non è parallelo alla funzione, ma un vettore.";
+              case 2: return "Errato: il punto critico libero non è necessariamente sul bordo.";
+              case 3: return "Errato: un punto critico non è sempre un massimo assoluto.";
+            }
+            break;
+
+          case 5: // Domanda 6
+            switch(idx) {
+              case 0: return "Errato: \\( \\lambda \\) non indica il punto massimo.";
+              case 1: return "Errato: non è il valore della funzione obiettivo.";
+              case 3: return "Errato: il metodo è valido anche per sistemi non lineari.";
+            }
+            break;
+
+          case 6: // Domanda 7
+            switch(idx) {
+              case 0: return "Errato: il gradiente si calcola con le derivate parziali, non con la Hessiana.";
+              case 2: return "Errato: i moltiplicatori sono un metodo diverso.";
+              case 3: return "Errato: la Hessiana non serve per stimare la continuità.";
+            }
+            break;
+
+          case 7: // Domanda 8
+            switch(idx) {
+              case 0: return "Errato: Hessiana definita positiva indica minimo locale, non massimo.";
+              case 2: return "Errato: semidefinita positiva non basta per massimo.";
+              case 3: return "Errato: 'definita negativa semidefinita' è contraddittorio.";
+            }
+            break;
+
+          case 8: // Domanda 9
+            switch(idx) {
+              case 0: return "Errato: integrale corretto ma con esponente sbagliato.";
+              case 1: return "Errato: formula non corretta per volume di rotazione.";
+              case 3: return "Errato: semplice integrale, non volume di rotazione.";
+            }
+            break;
+
+          case 9: // Domanda 10
+            switch(idx) {
+              case 1: return "Errato: integrale della magnitudine non dà lavoro.";
+              case 2: return "Errato: integrale con normale non dà lavoro.";
+              case 3: return "Errato: prodotto errato con \\( \\vec{r} \\).";
+            }
+            break;
+
+          case 10: // Domanda 11
+            switch(idx) {
+              case 0: return "Errato: valore corretto ma sbagliato calcolo intermedio.";
+              case 2: return "Errato: risultato numerico sbagliato.";
+              case 3: return "Errato: risultato troppo alto.";
+            }
+            break;
+
+          case 11: // Domanda 12
+            switch(idx) {
+              case 1: return "Errato: Stokes non riguarda uguaglianza integrali doppio/triplo.";
+              case 2: return "Errato: integrale di campo conservativo non sempre zero.";
+              case 3: return "Errato: integrale superficie non sempre nullo.";
+            }
+            break;
+
+          case 12: // Domanda 13
+            switch(idx) {
+              case 0: return "Errato: solenoidalità non implica gradiente.";
+              case 2: return "Errato: divergenza nulla non implica gradiente.";
+              case 3: return "Errato: campo costante non è condizione necessaria.";
+            }
+            break;
+
+          case 13: // Domanda 14
+            switch(idx) {
+              case 1: return "Errato: integrale di linea non è flusso.";
+              case 2: return "Errato: integrale superficie del rotore non è flusso.";
+              case 3: return "Errato: integrale volumetrico non è flusso.";
+            }
+            break;
+
+          case 14: // Domanda 15
+            switch(idx) {
+              case 0: return "Errato: somma dei vettori non dà area.";
+              case 1: return "Errato: prodotto scalare non dà area.";
+              case 3: return "Errato: prodotto scalare non dà area.";
+            }
+            break;
+        }
+      }
+    });
+
+    if (selected !== undefined && selected !== "") {
+      if (isCorrect) score++;
+      details += `
+        <p><strong>Q${i + 1}:</strong> ${isCorrect ? '<span class="correct">Corretto</span>' : '<span class="incorrect">Sbagliato</span>'}</p>
+        <p><strong>Risposta scelta:</strong> ${q.options[selected]}</p>
+        <p><strong>Spiegazione risposta scelta:</strong> ${isCorrect ? explanationsForOptions[correct] : explanationsForOptions[selected]}</p>
+        ${!isCorrect ? `<p><strong>Risposta corretta:</strong> ${q.options[correct]}</p>
+        <p><strong>Spiegazione risposta corretta:</strong> ${explanationsForOptions[correct]}</p>` : ''}
+        <hr />
+      `;
+    } else {
+      details += `
+        <p><strong>Q${i + 1}:</strong> <span class="incorrect">Non risposto</span></p>
+        <p><strong>Risposta corretta:</strong> ${q.options[correct]}</p>
+        <p><strong>Spiegazione:</strong> ${explanationsForOptions[correct]}</p>
+        <hr />
+      `;
+    }
+  });
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = `
+    <h2>Risultato: ${score} / ${questions.length}</h2>
+    ${details}
+  `;
+
+  MathJax.typesetPromise();
+  resultDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderQuiz();
+      document.getElementById('quiz').addEventListener('submit', calculateResult);
+    });
+  </script>
+</body>
+</html>
